@@ -133,7 +133,7 @@
 								<button class="product-wish wish">
 									<i class="fas fa-heart"></i>
 								</button>
-								<a class="product-image" th:href="@{/productDetail(id=${item.id})}">
+								<a class="product-image" th:href="@{/productDetail(productId=${item.id})}">
 									<img th:src="@{'/loadImage?imageName='+${item.productImage}}" alt="product" />
 								</a>
 								<div class="product-widget">
@@ -147,7 +147,7 @@
 									</a>
 									<a
 											title="Chi tiết sản phẩm"
-											th:href="@{/productDetail(id=${item.id})}"
+											th:href="@{/productDetail(productId=${item.id})}"
 											class="fas fa-eye">
 									</a>
 								</div>

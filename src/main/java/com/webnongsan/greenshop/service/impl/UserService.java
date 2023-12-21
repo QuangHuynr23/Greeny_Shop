@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class UserService implements UserServiceImpl {
             userDTO.setRegisterDate(new Date());
             userDTO.setStatus(true);
             userDTO.setAvatar("user.png");
-            userDTO.setRoleEntities(List.of(new RoleEntity("ROLE_USER")));
+            userDTO.setRoleEntities(Stream.of(new RoleEntity("ROLE_USER")).collect(Collectors.toList()));
             userRepository.save(userConverter.convertToEntity(userDTO));
             session.removeAttribute("otp");
             return true;
@@ -65,7 +66,7 @@ public class UserService implements UserServiceImpl {
         if (userDTO != null) {
             userDTO.setStatus(true);
             userDTO.setPassword(bCryptPasswordEncoder.encode(newPassword));
-            userDTO.setRoleEntities(List.of(new RoleEntity("ROLE_USER")));
+            userDTO.setRoleEntities(Stream.of(new RoleEntity("ROLE_USER")).collect(Collectors.toList()));
             UserEntity userEntity = userConverter.convertToEntity(userDTO);
             userRepository.save(userEntity);
         }

@@ -21,9 +21,9 @@ public class ProductDetailController extends CommonController {
     private final ProductServiceImpl productService;
 
     @GetMapping(value = "/productDetail")
-    public String getProductDetail(@RequestParam("productId") Long id,
+    public String getProductDetail(@RequestParam("productId") Long productId,
                                    Model model, UserDTO userDTO) {
-        ProductDTO productDTO = productService.findById(id);
+        ProductDTO productDTO = productService.findById(productId);
         model.addAttribute("product", productDTO);
         listProductByCategory10(model,productDTO.getCategory().getId());
         commonDataService.commonData(model, userDTO);
