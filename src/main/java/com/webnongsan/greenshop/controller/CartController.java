@@ -1,5 +1,6 @@
 package com.webnongsan.greenshop.controller;
 
+import com.google.zxing.WriterException;
 import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
@@ -19,12 +20,17 @@ import com.webnongsan.greenshop.service.OrderServiceImpl;
 import com.webnongsan.greenshop.service.ProductServiceImpl;
 import com.webnongsan.greenshop.service.ShoppingCartServiceImpl;
 import com.webnongsan.greenshop.service.impl.PaypalService;
+import com.webnongsan.greenshop.utils.MoMoPayUtil;
 import com.webnongsan.greenshop.utils.SystemUtils;
+import com.webnongsan.greenshop.utils.VNPayUtil;
+import com.webnongsan.greenshop.utils.ZaloPayUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.jcp.xml.dsig.internal.dom.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +38,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Date;
 
@@ -41,15 +51,20 @@ import java.util.Date;
 public class CartController extends CommonController{
      private final CommonDataService commonDataService;
      private HttpSession session;
-     private final ProductServiceImpl productService;
+
+     @Autowired
+     private MoMoPayUtil moMoPayUtil;
+
+     @Autowired
+     private ZaloPayUtil zaloPayUtil;
+
+     @Autowired
+     private VNPayUtil vnPayUtil;
      private final ShoppingCartServiceImpl shoppingCartService;
-     private final ProductConverter productConverter;
      private final ProductRepository productRepository;
      private final PaypalService paypalService;
      private final OrderServiceImpl orderService;
-     private final OrderConverter orderConverter;
-     private final OrderRepository orderRepository;
-     private final OrderDetailRepository orderDetailRepository;
+
      private OrderEntity orderFinal =new OrderEntity();
      private Logger log = LoggerFactory.getLogger(getClass());
 
@@ -107,7 +122,7 @@ public class CartController extends CommonController{
      }
 
      @PostMapping("/checkout")
-     public String checkOut(Model model,OrderEntity order,UserDTO userDTO, HttpServletRequest request) throws MessagingException {
+     public String checkOut(Model model, OrderEntity order, UserDTO userDTO, HttpServletRequest request, HttpServletResponse response) throws MessagingException, NoSuchAlgorithmException, IOException, InvalidKeyException, WriterException {
           String checkOut = request.getParameter("checkOut");
           Collection<CartItemEntity> cartItems = shoppingCartService.getCartItems();
           double totalPrice = getTotalPrice(cartItems);
@@ -127,6 +142,15 @@ public class CartController extends CommonController{
                catch (PayPalRESTException e) {
                     log.error(e.getMessage());
                }
+          }
+          if (StringUtils.equals(checkOut, "zalopay")) {
+               return zaloPayUtil.createVNPayPayment(request, response, totalPrice);
+          }
+          if (StringUtils.equals(checkOut, "vnpay")) {
+               return vnPayUtil.createVNPayPayment(request, response, totalPrice);
+          }
+          if (StringUtils.equals(checkOut, "momopay")) {
+               return moMoPayUtil.createMoMoPayment(request, response, totalPrice, (long) orderService.sumOrder()+1);
           }
           session = request.getSession();
           orderService.processOrder(order,userDTO,orderFinal,totalPrice,cartItems);

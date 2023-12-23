@@ -29,6 +29,28 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity,L
             "group by p.productName ")
     Page<Object[]> repoWhereProduct(Pageable pageable);
 
+    @Query("SELECT " +
+            "p.productName, " +
+            "sum(od.quantity), " +
+            "sum(od.price * od.quantity), " +
+            "avg(od.price), min(od.price), " +
+            "max(od.price) " +
+            "FROM OrderDetailEntity od " +
+            "inner join ProductEntity p on od.product.id = p.id " +
+            "group by p.productName ")
+    List<Object[]> repo();
+
+    @Query("SELECT c.categoryName, " +
+            "sum(od.quantity), " +
+            "sum(od.price*od.quantity)," +
+            "avg(od.price),min(od.price)," +
+            "max(od.price) " +
+            "FROM ProductEntity p  \n" +
+            "inner join CategoryEntity c on c.id = p.category.id \n" +
+            "inner join OrderDetailEntity od on od.product.id = p.id " +
+            "group by c.categoryName")
+    List<Object[]> repoCategory();
+
     // Statistics by category sold
     @Query("SELECT c.categoryName, " +
             "sum(od.quantity), " +
@@ -85,6 +107,17 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity,L
             "inner join OrderDetailEntity od on o.id=od.order.id " +
             "group by us.name")
     Page<Object[]> repoWhereCustomer(Pageable pageable);
+
+    @Query("SELECT us.name," +
+            "sum(od.quantity)," +
+            "sum(od.price*od.quantity)," +
+            "avg(od.price),min(od.price)," +
+            "max(od.price) " +
+            "FROM UserEntity us " +
+            "inner join OrderEntity o on us.id=o.user.id " +
+            "inner join OrderDetailEntity od on o.id=od.order.id " +
+            "group by us.name")
+    List<Object[]> repoCustomer();
 
     @Query("SELECT p.productName, " +
             "sum(od.quantity), " +

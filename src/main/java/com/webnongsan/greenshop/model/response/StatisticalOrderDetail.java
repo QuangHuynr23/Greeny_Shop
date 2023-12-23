@@ -10,7 +10,6 @@ import lombok.*;
 public class StatisticalOrderDetail {
 	private String name;
 	private int day;
-//	private Boolean status;
 	private int quantity;
 	private double sumPrice;
 	private double averagePrice;

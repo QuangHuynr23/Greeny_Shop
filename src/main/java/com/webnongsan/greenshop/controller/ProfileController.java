@@ -32,10 +32,9 @@ public class ProfileController extends CommonController{
     private final OrderServiceImpl orderService;
     private final CommonDataService commonDataService;
     private final OrderDetailServiceImpl orderDetailService;
-    private final OrderConverter orderConverter;
     @GetMapping("profile")
     public String profile(Model model, Principal principal, @RequestParam(defaultValue ="0" )    int page
-                                                          , @RequestParam(defaultValue ="12" )   int limit
+                                                          , @RequestParam(defaultValue ="5" )   int limit
                                                           , UserDTO userDTO){
         if (principal != null) {
 
@@ -48,13 +47,12 @@ public class ProfileController extends CommonController{
         );
         Page<OrderResponse> orderResponsePage = orderService.findOrderByUserId(userDTO.getId(),pageRequest);
         int totalPages = orderResponsePage.getTotalPages();
-        List<OrderResponse> orderResponseList = orderResponsePage.getContent();
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", page);
+        commonDataService.commonData(model, userDTO);
         List<Integer> pageNumbers = IntStream.rangeClosed(0, totalPages-1).boxed().collect(Collectors.toList());
         model.addAttribute("pageNumbers", pageNumbers);
-        commonDataService.commonData(model, userDTO);
-        model.addAttribute("orderByUser",orderResponseList);
+        model.addAttribute("orderByUser",orderResponsePage);
         return "web/profile";
     }
 

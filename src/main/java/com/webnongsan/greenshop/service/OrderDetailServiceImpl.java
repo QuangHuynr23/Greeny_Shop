@@ -9,6 +9,9 @@ import java.util.List;
 
 public interface OrderDetailServiceImpl {
     List<OrderDetailResponse> findOrderDetailByOrderId(Long orderId);
+    List<StatisticalOrderDetail> findOrderDetailOfProduct(String nameField);
+    List<StatisticalOrderDetail> statisticalCategory(String nameField);
+    List<StatisticalOrderDetail> statisticalCustomer(String nameField);
     Page<Object[]> statisticalByYear(PageRequest pageRequest);
     Page<Object[]> statisticalByMonth(PageRequest pageRequest);
     Page<Object[]> statisticalByQuarter(PageRequest pageRequest);

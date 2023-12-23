@@ -62,7 +62,7 @@ public class ReportController {
 		paginateResponse.setTotalPage(totalPages);
 		paginateResponse.setPage(page);
 		model.addAttribute("paginate", paginateResponse);
-		return "admin/statisticalOfProduct";
+		return "admin/statisticalOfCategory";
 	}
 
 	// Statistics of products sold by year
@@ -142,6 +142,6 @@ public class ReportController {
 		paginateResponse.setTotalPage(totalPages);
 		paginateResponse.setPage(page);
 		model.addAttribute("paginate", paginateResponse);
-		return "admin/statisticalOfProduct";
+		return "admin/statisticalOfCustomer";
 	}
 }

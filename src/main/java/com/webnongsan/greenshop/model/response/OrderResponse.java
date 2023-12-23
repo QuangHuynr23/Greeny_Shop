@@ -1,5 +1,6 @@
 package com.webnongsan.greenshop.model.response;
 
+import com.webnongsan.greenshop.repository.Entities.UserEntity;
 import lombok.*;
 
 import java.util.Date;
@@ -15,4 +16,5 @@ public class OrderResponse {
     private String address;
     private String phone;
     private int status;
+    private UserEntity user;
 }

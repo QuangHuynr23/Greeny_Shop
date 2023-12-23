@@ -27,6 +27,39 @@ public class OrderDetailService implements OrderDetailServiceImpl {
     }
 
     @Override
+    public List<StatisticalOrderDetail> findOrderDetailOfProduct(String nameField) {
+        List<StatisticalOrderDetail> statisticalOrderDetails = new ArrayList<>();
+        List<Object[]> objects = orderDetailRepository.repo();
+        for(Object[] object : objects){
+            StatisticalOrderDetail orderDetail = mapToObject(object, nameField);
+            statisticalOrderDetails.add(orderDetail);
+        }
+        return statisticalOrderDetails;
+    }
+
+    @Override
+    public List<StatisticalOrderDetail> statisticalCategory(String nameField) {
+        List<StatisticalOrderDetail> statisticalOrderDetails = new ArrayList<>();
+        List<Object[]> objects = orderDetailRepository.repoCategory();
+        for(Object[] object : objects){
+            StatisticalOrderDetail orderDetail = mapToObject(object, nameField);
+            statisticalOrderDetails.add(orderDetail);
+        }
+        return statisticalOrderDetails;
+    }
+
+    @Override
+    public List<StatisticalOrderDetail> statisticalCustomer(String nameField) {
+        List<StatisticalOrderDetail> statisticalOrderDetails = new ArrayList<>();
+        List<Object[]> objects = orderDetailRepository.repoCustomer();
+        for(Object[] object : objects){
+            StatisticalOrderDetail orderDetail = mapToObject(object, nameField);
+            statisticalOrderDetails.add(orderDetail);
+        }
+        return statisticalOrderDetails;
+    }
+
+    @Override
     public Page<Object[]> statisticalByYear(PageRequest pageRequest) {
         return orderDetailRepository.repoWhereYear(pageRequest);
     }
@@ -63,20 +96,24 @@ public class OrderDetailService implements OrderDetailServiceImpl {
     public List<StatisticalOrderDetail> mapToStatisticalOrderDetailList(Page<Object[]> objects, String nameField) {
         List<StatisticalOrderDetail> statisticalOrderDetails = new ArrayList<>();
         for(Object[] object : objects.getContent()){
-            StatisticalOrderDetail orderDetailOfProduct = new StatisticalOrderDetail();
-            if("day".equals(nameField)){
-                orderDetailOfProduct.setDay(Integer.parseInt(object[0].toString()));
-            } else {
-                orderDetailOfProduct.setName(object[0].toString());
-            }
-            orderDetailOfProduct.setQuantity(Integer.parseInt(object[1].toString()));
-            orderDetailOfProduct.setSumPrice(Double.parseDouble(object[2].toString()));
-            orderDetailOfProduct.setAveragePrice(Double.parseDouble(object[3].toString()));
-            orderDetailOfProduct.setMinimumPrice(Double.parseDouble(object[4].toString()));
-            orderDetailOfProduct.setMaximumPrice(Double.parseDouble(object[5].toString()));
-            statisticalOrderDetails.add(orderDetailOfProduct);
+            StatisticalOrderDetail orderDetail = mapToObject(object, nameField);
+            statisticalOrderDetails.add(orderDetail);
         }
         return statisticalOrderDetails;
+    }
+    private StatisticalOrderDetail mapToObject(Object[] object, String nameField) {
+        StatisticalOrderDetail orderDetail = new StatisticalOrderDetail();
+        if ("day".equals(nameField)) {
+            orderDetail.setDay(Integer.parseInt(object[0].toString()));
+        } else {
+            orderDetail.setName(object[0].toString());
+        }
+        orderDetail.setQuantity(Integer.parseInt(object[1].toString()));
+        orderDetail.setSumPrice(Double.parseDouble(object[2].toString()));
+        orderDetail.setAveragePrice(Double.parseDouble(object[3].toString()));
+        orderDetail.setMinimumPrice(Double.parseDouble(object[4].toString()));
+        orderDetail.setMaximumPrice(Double.parseDouble(object[5].toString()));
+        return orderDetail;
     }
 
 }

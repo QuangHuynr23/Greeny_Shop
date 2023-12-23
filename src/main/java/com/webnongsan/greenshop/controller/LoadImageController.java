@@ -16,6 +16,8 @@ public class LoadImageController {
 
 	@Value("${upload.path}")
 	private String pathUploadImage;
+	@Value("${upload.qrcode.path}")
+	private String pathUploadImageQRCode;
 
 	@GetMapping(value = "loadImage")
 	@ResponseBody
@@ -42,6 +44,26 @@ public class LoadImageController {
 			File defaultImage = new File(pathUploadImage + File.separatorChar + "notfound.jpg");
 			inputStream = new FileInputStream(defaultImage);
 			return IOUtils.toByteArray(inputStream);
+		}
+		return null;
+	}
+
+	@GetMapping(value = "loadImageQRCode")
+	@ResponseBody
+	public byte[] upload(@RequestParam(value = "imageName") String imageName, HttpServletResponse response)
+			throws IOException {
+		response.setContentType("image/png");
+		File file = new File(pathUploadImageQRCode + File.separatorChar + imageName);
+		InputStream inputStream = null;
+		if (file.exists()) {
+			try {
+				inputStream = new FileInputStream(file);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			if (inputStream != null) {
+				return IOUtils.toByteArray(inputStream);
+			}
 		}
 		return null;
 	}

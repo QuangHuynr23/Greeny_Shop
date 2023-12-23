@@ -1,5 +1,6 @@
 package com.webnongsan.greenshop.service;
 
+import com.google.zxing.WriterException;
 import com.webnongsan.greenshop.model.dto.OrderDTO;
 import com.webnongsan.greenshop.model.dto.UserDTO;
 import com.webnongsan.greenshop.model.response.OrderResponse;
@@ -11,12 +12,13 @@ import org.springframework.data.domain.PageRequest;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 public interface OrderServiceImpl {
     void processOrder(OrderEntity orderDTO, UserDTO userDTO,
-                      OrderEntity orderFinal,double totalPrice, Collection<CartItemEntity> cartItems) throws MessagingException;
+                      OrderEntity orderFinal,double totalPrice, Collection<CartItemEntity> cartItems) throws MessagingException, IOException, WriterException;
     void processSuccessfulPayment(UserDTO userDTO,double totalPrice,
                                   OrderEntity orderFinal, Collection<CartItemEntity> cartItems) throws MessagingException;
     void removeOrder(Long id);
@@ -26,4 +28,6 @@ public interface OrderServiceImpl {
     void updateOrderStatus(Long id,int status);
     List<OrderDTO> findAll();
     OrderDTO findById(Long id);
+
+    int sumOrder();
 }

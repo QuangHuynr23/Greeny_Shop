@@ -1,5 +1,6 @@
 package com.webnongsan.greenshop.service.impl;
 
+import com.google.zxing.WriterException;
 import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
@@ -19,6 +20,7 @@ import com.webnongsan.greenshop.repository.OrderRepository;
 import com.webnongsan.greenshop.repository.ProductRepository;
 import com.webnongsan.greenshop.repository.UserRepository;
 import com.webnongsan.greenshop.service.OrderServiceImpl;
+import com.webnongsan.greenshop.utils.QRCodeGenerator;
 import com.webnongsan.greenshop.utils.SystemUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -55,9 +58,7 @@ public class OrderService implements OrderServiceImpl {
 
     @Override
     @Transactional
-    public void processOrder(OrderEntity order, UserDTO userDTO, OrderEntity orderFinal, double totalPrice, Collection<CartItemEntity> cartItems) throws MessagingException {
-
-
+    public void processOrder(OrderEntity order, UserDTO userDTO, OrderEntity orderFinal, double totalPrice, Collection<CartItemEntity> cartItems) throws MessagingException, IOException, WriterException {
         BeanUtils.copyProperties(order, orderFinal);
         UserEntity userEntity = userConverter.convertToEntity(userDTO);
         userEntity = userRepository.findById(userEntity.getId()).orElse(null);
@@ -65,6 +66,9 @@ public class OrderService implements OrderServiceImpl {
         orderEntity.setStatus(0);
         orderRepository.save(orderEntity);
         saveOrderDetails(orderEntity, cartItems);
+        // Tạo mã QRCode
+        QRCodeGenerator codeGenerator = new QRCodeGenerator();
+        codeGenerator.generateQRCode(order, cartItems);
         // sendMail
         sendOrderConfirmationEmail(userDTO.getEmail(), "Greeny-Shop Xác Nhận Đơn hàng", "aaaa", cartItems, totalPrice, order);
     }
@@ -126,6 +130,11 @@ public class OrderService implements OrderServiceImpl {
     public OrderDTO findById(Long id) {
         Optional<OrderEntity> orderEntity =  orderRepository.findById(id);
         return orderEntity.map(orderConverter::convertToDTO).orElse(null);
+    }
+
+    @Override
+    public int sumOrder() {
+        return orderRepository.sumOrder();
     }
 
 
